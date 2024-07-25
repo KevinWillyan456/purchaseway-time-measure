@@ -1,0 +1,7 @@
+{
+    "name": "purchaseway-time-measure",
+    "integrations": {
+        "capacitor": {}
+    },
+    "type": "react-vite"
+}
