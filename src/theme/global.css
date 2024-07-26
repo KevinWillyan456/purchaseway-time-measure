@@ -1,7 +1,7 @@
 :root {
     --color-black: #000;
     --color-white: #fff;
-    --ion-color-primary: red;
+    --ion-color-primary: var(--color-black);
 }
 * {
     margin: 0;
@@ -16,4 +16,7 @@ h5,
 h6 {
     margin: 0;
     padding: 0;
+}
+body {
+    background-color: #ececec;
 }
