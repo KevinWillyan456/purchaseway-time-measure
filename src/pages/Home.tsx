@@ -4,8 +4,12 @@ import {
     IonDatetimeButton,
     IonIcon,
     IonImg,
+    IonItem,
+    IonList,
     IonModal,
     IonPage,
+    IonSelect,
+    IonSelectOption,
     IonText,
 } from '@ionic/react'
 import { calculatorOutline } from 'ionicons/icons'
@@ -16,6 +20,12 @@ const Home: React.FC = () => {
     const [showError, setShowError] = useState<boolean>(false)
     const [showResult, setShowResult] = useState<boolean>(false)
     const [result, setResult] = useState<string>('')
+    const [typeStartInterval, setTypeStartInterval] = useState<
+        'custom' | 'now'
+    >('now')
+    const [unitOfTime, setUnitOfTime] = useState<
+        'hours' | 'minutes' | 'hours-minutes'
+    >('hours-minutes')
 
     const getLocalISOTime = () => {
         const date = new Date()
@@ -43,7 +53,10 @@ const Home: React.FC = () => {
     const [end, setEnd] = useState<string>(getLocalISOTime())
 
     const handleCalculate = () => {
-        const startDate = new Date(start)
+        const startDate =
+            typeStartInterval === 'now'
+                ? new Date(getLocalISOTime())
+                : new Date(start)
         const endDate = new Date(end)
 
         if (startDate > endDate) {
@@ -53,12 +66,28 @@ const Home: React.FC = () => {
 
         setShowError(false)
 
-        const diff = endDate.getTime() - startDate.getTime()
-        const hours = Math.floor(diff / 1000 / 60 / 60)
-        const minutes = Math.floor((diff / 1000 / 60) % 60)
+        if (unitOfTime === 'hours') {
+            const diff = endDate.getTime() - startDate.getTime()
+            const hours = Math.floor(diff / 1000 / 60 / 60)
+            setResult(`${hours}h`)
 
-        setShowResult(true)
-        setResult(`${hours}h ${minutes}m`)
+            setShowResult(true)
+            return
+        } else if (unitOfTime === 'minutes') {
+            const diff = endDate.getTime() - startDate.getTime()
+            const minutes = Math.floor(diff / 1000 / 60)
+            setResult(`${minutes}m`)
+
+            setShowResult(true)
+            return
+        } else {
+            const diff = endDate.getTime() - startDate.getTime()
+            const hours = Math.floor(diff / 1000 / 60 / 60)
+            const minutes = Math.floor((diff / 1000 / 60) % 60)
+            setResult(`${hours}h ${minutes}m`)
+
+            setShowResult(true)
+        }
     }
 
     const imageStyles = {
@@ -66,6 +95,11 @@ const Home: React.FC = () => {
         maxWidth: '200px',
         marginTop: '1rem',
         pointerEvents: 'none',
+    }
+
+    const hiddenComponents = () => {
+        setShowResult(false)
+        setShowError(false)
     }
 
     return (
@@ -79,31 +113,94 @@ const Home: React.FC = () => {
                     </IonText>
                 )}
 
-                <div className="form-group">
-                    <p>Intervalo de início</p>
+                <p style={{ marginBottom: '1.5rem' }}>
+                    Selecione o intervalo de tempo para calcular a diferença.
+                </p>
 
-                    <div className="datetime-wrapper">
-                        <IonDatetimeButton datetime="datetime-start"></IonDatetimeButton>
-                    </div>
+                <p>Escolha a unidade de tempo:</p>
 
-                    <IonModal keepContentsMounted={true}>
-                        <IonDatetime
-                            id="datetime-start"
-                            locale="pt-BR"
-                            value={start}
+                <IonList>
+                    <IonItem>
+                        <IonSelect
+                            aria-label="Unidade de tempo"
+                            value={unitOfTime}
+                            interface="popover"
+                            placeholder="Selecione a unidade"
                             onIonChange={(e) => {
-                                setStart(
-                                    Array.isArray(e.detail.value)
-                                        ? e.detail.value.join('')
-                                        : e.detail.value ?? ''
+                                setUnitOfTime(
+                                    e.detail.value as
+                                        | 'hours'
+                                        | 'minutes'
+                                        | 'hours-minutes'
                                 )
 
-                                setShowResult(false)
-                                setShowError(false)
+                                hiddenComponents()
                             }}
-                        ></IonDatetime>
-                    </IonModal>
-                </div>
+                        >
+                            <IonSelectOption value="hours">
+                                Horas
+                            </IonSelectOption>
+                            <IonSelectOption value="minutes">
+                                Minutos
+                            </IonSelectOption>
+                            <IonSelectOption value="hours-minutes">
+                                Horas e Minutos
+                            </IonSelectOption>
+                        </IonSelect>
+                    </IonItem>
+                </IonList>
+
+                <p>Escolha o tipo de intervalo de início:</p>
+
+                <IonList style={{ marginBottom: '1rem' }}>
+                    <IonItem>
+                        <IonSelect
+                            aria-label="Tipo de intervalo"
+                            value={typeStartInterval}
+                            interface="popover"
+                            placeholder="Selecione o tipo de intervalo"
+                            onIonChange={(e) => {
+                                setTypeStartInterval(
+                                    e.detail.value as 'custom' | 'now'
+                                )
+
+                                hiddenComponents()
+                            }}
+                        >
+                            <IonSelectOption value="now">Agora</IonSelectOption>
+                            <IonSelectOption value="custom">
+                                Personalizado
+                            </IonSelectOption>
+                        </IonSelect>
+                    </IonItem>
+                </IonList>
+
+                {typeStartInterval === 'custom' && (
+                    <div className="form-group">
+                        <p>Intervalo de início</p>
+
+                        <div className="datetime-wrapper">
+                            <IonDatetimeButton datetime="datetime-start"></IonDatetimeButton>
+                        </div>
+
+                        <IonModal keepContentsMounted={true}>
+                            <IonDatetime
+                                id="datetime-start"
+                                locale="pt-BR"
+                                value={start}
+                                onIonChange={(e) => {
+                                    setStart(
+                                        Array.isArray(e.detail.value)
+                                            ? e.detail.value.join('')
+                                            : e.detail.value ?? ''
+                                    )
+
+                                    hiddenComponents()
+                                }}
+                            ></IonDatetime>
+                        </IonModal>
+                    </div>
+                )}
 
                 <div className="form-group">
                     <p>Intervalo de término</p>
@@ -123,8 +220,8 @@ const Home: React.FC = () => {
                                         ? e.detail.value.join('')
                                         : e.detail.value ?? ''
                                 )
-                                setShowResult(false)
-                                setShowError(false)
+
+                                hiddenComponents()
                             }}
                         ></IonDatetime>
                     </IonModal>
