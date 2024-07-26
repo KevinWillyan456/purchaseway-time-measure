@@ -1,0 +1,26 @@
+.home-container {
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 40px 20px;
+    box-shadow: 0 0 10px #0000001a;
+}
+.header {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: var(--color-black);
+}
+.form-group {
+    margin-bottom: 12px;
+}
+.form-group p {
+    font-size: 16px;
+}
+.datetime-wrapper {
+    display: flex;
+}
+.result {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
