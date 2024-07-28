@@ -119,12 +119,6 @@ const Home: React.FC = () => {
             <section className="home-container">
                 <h1 className="header">Calculadora de Intervalo de Tempo</h1>
 
-                {showError && (
-                    <IonText color="danger">
-                        O término não pode ser antes do início.
-                    </IonText>
-                )}
-
                 <p style={{ marginBottom: '1.5rem' }}>
                     Selecione o intervalo de tempo para calcular a diferença.
                 </p>
@@ -255,6 +249,17 @@ const Home: React.FC = () => {
                     ></IonIcon>
                     Calcular
                 </IonButton>
+
+                {showError && (
+                    <IonText color="danger">
+                        <p
+                            style={{ marginTop: '1rem' }}
+                            className="error-message"
+                        >
+                            O término não pode ser antes do início.
+                        </p>
+                    </IonText>
+                )}
 
                 {showResult && (
                     <div className="result">

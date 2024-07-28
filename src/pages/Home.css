@@ -28,7 +28,11 @@
 .datetime-wrapper {
     display: flex;
 }
+.error-message {
+    animation: fadeIn 500ms;
+}
 .result {
+    animation: fadeIn 500ms;
     width: 100%;
     margin-top: 40px;
     display: flex;
@@ -36,6 +40,14 @@
     align-items: center;
     flex-direction: column;
     gap: 16px;
+}
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 .result .result-title {
     font-size: 20px;
