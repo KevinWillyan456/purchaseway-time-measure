@@ -11,10 +11,12 @@ import {
     IonSelect,
     IonSelectOption,
     IonText,
+    useIonRouter,
 } from '@ionic/react'
 import { calculatorOutline } from 'ionicons/icons'
 import './Home.css'
 import { useState } from 'react'
+import { App } from '@capacitor/app'
 
 const Home: React.FC = () => {
     const [showError, setShowError] = useState<boolean>(false)
@@ -61,6 +63,7 @@ const Home: React.FC = () => {
 
         if (startDate > endDate) {
             setShowError(true)
+            setShowResult(false)
             return
         }
 
@@ -101,6 +104,15 @@ const Home: React.FC = () => {
         setShowResult(false)
         setShowError(false)
     }
+
+    const ionRouter = useIonRouter()
+    document.addEventListener('ionBackButton', (ev: any) => {
+        ev.detail.register(-1, () => {
+            if (!ionRouter.canGoBack()) {
+                App.exitApp()
+            }
+        })
+    })
 
     return (
         <IonPage>
@@ -251,7 +263,7 @@ const Home: React.FC = () => {
                         </h4>
                         <span className="result-time">{result}</span>
                         <IonImg
-                            src="https://linda.nyc3.cdn.digitaloceanspaces.com/370_npd_webp-o_06/sticker-fan_11257922_o.webp"
+                            src="assets/logo.png"
                             alt="Sticker decorativo"
                             style={imageStyles}
                         />
