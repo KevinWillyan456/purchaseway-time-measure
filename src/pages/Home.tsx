@@ -13,7 +13,7 @@ import {
     IonText,
     useIonRouter,
 } from '@ionic/react'
-import { calculatorOutline } from 'ionicons/icons'
+import { calculatorOutline, trashOutline } from 'ionicons/icons'
 import './Home.css'
 import { useState } from 'react'
 import { App } from '@capacitor/app'
@@ -249,6 +249,27 @@ const Home: React.FC = () => {
                     ></IonIcon>
                     Calcular
                 </IonButton>
+
+                {showResult && (
+                    <IonButton
+                        shape="round"
+                        fill="outline"
+                        onClick={() => setShowResult(false)}
+                        style={{
+                            marginTop: '0.5rem',
+                            marginLeft: '0.5rem',
+                            animation: 'fadeIn 500ms',
+                        }}
+                    >
+                        <IonIcon
+                            icon={trashOutline}
+                            style={{
+                                marginRight: '0.3rem',
+                            }}
+                        ></IonIcon>
+                        Limpar
+                    </IonButton>
+                )}
 
                 {showError && (
                     <IonText color="danger">
