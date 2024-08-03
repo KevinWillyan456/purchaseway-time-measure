@@ -17,6 +17,13 @@ import { calculatorOutline, trashOutline } from 'ionicons/icons'
 import './Home.css'
 import { useState } from 'react'
 import { App } from '@capacitor/app'
+import {
+    differenceInDays,
+    differenceInHours,
+    differenceInMinutes,
+    differenceInSeconds,
+    intervalToDuration,
+} from 'date-fns'
 
 type TypeUnitOfTime =
     | 'seconds'
@@ -26,6 +33,19 @@ type TypeUnitOfTime =
     | 'days'
     | 'days-hours'
     | 'days-hours-minutes'
+    | 'weeks'
+    | 'weeks-days'
+    | 'weeks-days-hours'
+    | 'weeks-days-hours-minutes'
+    | 'months'
+    | 'months-days'
+    | 'months-days-hours'
+    | 'months-days-hours-minutes'
+    | 'years'
+    | 'years-months'
+    | 'years-months-days'
+    | 'years-months-days-hours'
+    | 'years-months-days-hours-minutes'
 
 const unitOfTimeOptions: { value: TypeUnitOfTime; label: string }[] = [
     { value: 'seconds', label: 'Segundos' },
@@ -35,6 +55,28 @@ const unitOfTimeOptions: { value: TypeUnitOfTime; label: string }[] = [
     { value: 'days', label: 'Dias' },
     { value: 'days-hours', label: 'Dias e Horas' },
     { value: 'days-hours-minutes', label: 'Dias, Horas e Minutos' },
+    { value: 'weeks', label: 'Semanas' },
+    { value: 'weeks-days', label: 'Semanas e Dias' },
+    { value: 'weeks-days-hours', label: 'Semanas, Dias e Horas' },
+    {
+        value: 'weeks-days-hours-minutes',
+        label: 'Semanas, Dias, Horas e Minutos',
+    },
+    { value: 'months', label: 'Meses' },
+    { value: 'months-days', label: 'Meses e Dias' },
+    { value: 'months-days-hours', label: 'Meses, Dias e Horas' },
+    {
+        value: 'months-days-hours-minutes',
+        label: 'Meses, Dias, Horas e Minutos',
+    },
+    { value: 'years', label: 'Anos' },
+    { value: 'years-months', label: 'Anos e Meses' },
+    { value: 'years-months-days', label: 'Anos, Meses e Dias' },
+    { value: 'years-months-days-hours', label: 'Anos, Meses, Dias e Horas' },
+    {
+        value: 'years-months-days-hours-minutes',
+        label: 'Anos, Meses, Dias, Horas e Minutos',
+    },
 ]
 
 type TypeOfStartInterval = 'now' | 'custom'
@@ -43,6 +85,8 @@ const startIntervalOptions: { value: TypeOfStartInterval; label: string }[] = [
     { value: 'now', label: 'Agora' },
     { value: 'custom', label: 'Personalizado' },
 ]
+
+const MAX_YEARS_AHEAD_OF_TODAY = 100
 
 const Home: React.FC = () => {
     const [showError, setShowError] = useState<boolean>(false)
@@ -94,57 +138,135 @@ const Home: React.FC = () => {
 
         setShowError(false)
 
-        if (unitOfTime === 'days') {
-            const diff = endDate.getTime() - startDate.getTime()
-            const days = Math.floor(diff / 1000 / 60 / 60 / 24)
-            setResult(`${days}d`)
+        const duration = intervalToDuration({ start: startDate, end: endDate })
 
-            setShowResult(true)
-            return
-        } else if (unitOfTime === 'hours') {
-            const diff = endDate.getTime() - startDate.getTime()
-            const hours = Math.floor(diff / 1000 / 60 / 60)
-            setResult(`${hours}h`)
+        const years = duration.years || 0
+        const months = duration.months || 0
+        const days = duration.days || 0
+        const hours = duration.hours || 0
+        const minutes = duration.minutes || 0
 
-            setShowResult(true)
-            return
-        } else if (unitOfTime === 'minutes') {
-            const diff = endDate.getTime() - startDate.getTime()
-            const minutes = Math.floor(diff / 1000 / 60)
-            setResult(`${minutes}m`)
-
-            setShowResult(true)
-            return
-        } else if (unitOfTime === 'seconds') {
-            const diff = endDate.getTime() - startDate.getTime()
-            const seconds = Math.floor(diff / 1000)
-            setResult(`${seconds}s`)
-
-            setShowResult(true)
-            return
-        } else if (unitOfTime === 'hours-minutes') {
-            const diff = endDate.getTime() - startDate.getTime()
-            const hours = Math.floor(diff / 1000 / 60 / 60)
-            const minutes = Math.floor((diff / 1000 / 60) % 60)
-            setResult(`${hours}h ${minutes}m`)
-
-            setShowResult(true)
-        } else if (unitOfTime === 'days-hours') {
-            const diff = endDate.getTime() - startDate.getTime()
-            const days = Math.floor(diff / 1000 / 60 / 60 / 24)
-            const hours = Math.floor((diff / 1000 / 60 / 60) % 24)
-            setResult(`${days}d ${hours}h`)
-
-            setShowResult(true)
-        } else if (unitOfTime === 'days-hours-minutes') {
-            const diff = endDate.getTime() - startDate.getTime()
-            const days = Math.floor(diff / 1000 / 60 / 60 / 24)
-            const hours = Math.floor((diff / 1000 / 60 / 60) % 24)
-            const minutes = Math.floor((diff / 1000 / 60) % 60)
-            setResult(`${days}d ${hours}h ${minutes}m`)
-
-            setShowResult(true)
+        switch (unitOfTime) {
+            case 'days':
+                setResult(`${days}d`)
+                break
+            case 'hours':
+                const totalHours = differenceInHours(endDate, startDate)
+                setResult(`${totalHours}h`)
+                break
+            case 'minutes':
+                const totalMinutes = differenceInMinutes(endDate, startDate)
+                setResult(`${totalMinutes}m`)
+                break
+            case 'seconds':
+                const totalSeconds = differenceInSeconds(endDate, startDate)
+                setResult(`${totalSeconds}s`)
+                break
+            case 'hours-minutes':
+                const hoursForMinutes = Math.floor(
+                    differenceInMinutes(endDate, startDate) / 60
+                )
+                const minutesForMinutes =
+                    differenceInMinutes(endDate, startDate) % 60
+                setResult(`${hoursForMinutes}h ${minutesForMinutes}m`)
+                break
+            case 'days-hours':
+                const daysForHours = Math.floor(
+                    differenceInHours(endDate, startDate) / 24
+                )
+                const remainingHoursForHours =
+                    differenceInHours(endDate, startDate) % 24
+                setResult(`${daysForHours}d ${remainingHoursForHours}h`)
+                break
+            case 'days-hours-minutes':
+                const totalDaysForMinutes = Math.floor(
+                    differenceInMinutes(endDate, startDate) / (24 * 60)
+                )
+                const hoursWithinDayForMinutes = Math.floor(
+                    (differenceInMinutes(endDate, startDate) % (24 * 60)) / 60
+                )
+                const minutesWithinHourForMinutes =
+                    differenceInMinutes(endDate, startDate) % 60
+                setResult(
+                    `${totalDaysForMinutes}d ${hoursWithinDayForMinutes}h ${minutesWithinHourForMinutes}m`
+                )
+                break
+            case 'weeks':
+                const weeks = Math.floor(
+                    differenceInDays(endDate, startDate) / 7
+                )
+                setResult(`${weeks}w`)
+                break
+            case 'weeks-days':
+                const totalWeeks = Math.floor(
+                    differenceInDays(endDate, startDate) / 7
+                )
+                const daysWithinWeek = differenceInDays(endDate, startDate) % 7
+                setResult(`${totalWeeks}w ${daysWithinWeek}d`)
+                break
+            case 'weeks-days-hours':
+                const weeksForDays = Math.floor(
+                    differenceInHours(endDate, startDate) / (7 * 24)
+                )
+                const daysWithinWeekForHours = Math.floor(
+                    (differenceInHours(endDate, startDate) % (7 * 24)) / 24
+                )
+                const hoursWithinWeekForHours =
+                    differenceInHours(endDate, startDate) % 24
+                setResult(
+                    `${weeksForDays}w ${daysWithinWeekForHours}d ${hoursWithinWeekForHours}h`
+                )
+                break
+            case 'weeks-days-hours-minutes':
+                const weeksForMinutes = Math.floor(
+                    differenceInMinutes(endDate, startDate) / (7 * 24 * 60)
+                )
+                const daysWithinWeekForMinutes = Math.floor(
+                    (differenceInMinutes(endDate, startDate) % (7 * 24 * 60)) /
+                        (24 * 60)
+                )
+                const hoursWithinWeekForMinutes = Math.floor(
+                    (differenceInMinutes(endDate, startDate) % (24 * 60)) / 60
+                )
+                const minutesWithinWeekForMinutes =
+                    differenceInMinutes(endDate, startDate) % 60
+                setResult(
+                    `${weeksForMinutes}w ${daysWithinWeekForMinutes}d ${hoursWithinWeekForMinutes}h ${minutesWithinWeekForMinutes}m`
+                )
+                break
+            case 'months':
+                setResult(`${months}M`)
+                break
+            case 'months-days':
+                setResult(`${months}M ${days}d`)
+                break
+            case 'months-days-hours':
+                setResult(`${months}M ${days}d ${hours}h`)
+                break
+            case 'months-days-hours-minutes':
+                setResult(`${months}M ${days}d ${hours}h ${minutes}m`)
+                break
+            case 'years':
+                setResult(`${years}y`)
+                break
+            case 'years-months':
+                setResult(`${years}y ${months}M`)
+                break
+            case 'years-months-days':
+                setResult(`${years}y ${months}M ${days}d`)
+                break
+            case 'years-months-days-hours':
+                setResult(`${years}y ${months}M ${days}d ${hours}h`)
+                break
+            case 'years-months-days-hours-minutes':
+                setResult(`${years}y ${months}M ${days}d ${hours}h ${minutes}m`)
+                break
+            default:
+                setShowResult(false)
+                return
         }
+
+        setShowResult(true)
     }
 
     const imageStyles = {
@@ -246,6 +368,15 @@ const Home: React.FC = () => {
                                 id="datetime-start"
                                 locale="pt-BR"
                                 value={start}
+                                max={new Date(
+                                    new Date().setFullYear(
+                                        new Date().getFullYear() +
+                                            MAX_YEARS_AHEAD_OF_TODAY
+                                    )
+                                )
+                                    .toISOString()
+                                    .split('-')[0]
+                                    .concat('-12-31T23:59:00.000Z')}
                                 onIonChange={(e) => {
                                     setStart(
                                         Array.isArray(e.detail.value)
@@ -272,6 +403,15 @@ const Home: React.FC = () => {
                             id="datetime-end"
                             locale="pt-BR"
                             value={end}
+                            max={new Date(
+                                new Date().setFullYear(
+                                    new Date().getFullYear() +
+                                        MAX_YEARS_AHEAD_OF_TODAY
+                                )
+                            )
+                                .toISOString()
+                                .split('-')[0]
+                                .concat('-12-31T23:59:00.000Z')}
                             onIonChange={(e) => {
                                 setEnd(
                                     Array.isArray(e.detail.value)
