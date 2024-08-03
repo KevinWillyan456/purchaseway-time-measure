@@ -8,7 +8,7 @@ Este é um aplicativo desenvolvido com Ionic, React, Capacitor e TypeScript que 
 - [Funcionalidades](#funcionalidades)
 - [Tecnologias Utilizadas](#tecnologias-utilizadas)
 - [Capturas de Tela](#capturas-de-tela)
-- [Solução de problemas](#solução-de-problemas)
+- [Solução de Problemas](#solução-de-problemas)
 - [Capturas de Tela](#capturas-de-tela)
 - [Licença](#licença)
 
@@ -73,12 +73,12 @@ ionic serve
 
 ### Consertar o Visual
 
-Navegue até a pasta `android/app/src/main/res/values` do seu projeto Ionic e abra o arquivo `strings.xml`. Adicione as seguintes linhas de código dentro da tag `<style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">`
+Navegue até a pasta `android/app/src/main/res/values` do seu projeto Ionic e abra o arquivo `styles.xml`. Adicione as seguintes linhas de código dentro da tag `<style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">`
 
    ```xml
-      <item name="android:background">@android:color/white</item>
-      <item name="android:navigationBarColor">@android:color/white</item>
-      <item name="android:windowFullscreen">true</item>
+   <item name="android:background">@android:color/white</item>
+   <item name="android:navigationBarColor">@android:color/white</item>
+   <item name="android:windowFullscreen">true</item>
    ```
 
 ### Comandos de Build APK
