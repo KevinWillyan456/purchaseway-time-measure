@@ -18,16 +18,41 @@ import './Home.css'
 import { useState } from 'react'
 import { App } from '@capacitor/app'
 
+type TypeUnitOfTime =
+    | 'seconds'
+    | 'minutes'
+    | 'hours'
+    | 'hours-minutes'
+    | 'days'
+    | 'days-hours'
+    | 'days-hours-minutes'
+
+const unitOfTimeOptions: { value: TypeUnitOfTime; label: string }[] = [
+    { value: 'seconds', label: 'Segundos' },
+    { value: 'minutes', label: 'Minutos' },
+    { value: 'hours', label: 'Horas' },
+    { value: 'hours-minutes', label: 'Horas e Minutos' },
+    { value: 'days', label: 'Dias' },
+    { value: 'days-hours', label: 'Dias e Horas' },
+    { value: 'days-hours-minutes', label: 'Dias, Horas e Minutos' },
+]
+
+type TypeOfStartInterval = 'now' | 'custom'
+
+const startIntervalOptions: { value: TypeOfStartInterval; label: string }[] = [
+    { value: 'now', label: 'Agora' },
+    { value: 'custom', label: 'Personalizado' },
+]
+
 const Home: React.FC = () => {
     const [showError, setShowError] = useState<boolean>(false)
     const [showResult, setShowResult] = useState<boolean>(false)
     const [result, setResult] = useState<string>('')
-    const [typeStartInterval, setTypeStartInterval] = useState<
-        'custom' | 'now'
-    >('now')
-    const [unitOfTime, setUnitOfTime] = useState<
-        'hours' | 'minutes' | 'hours-minutes'
-    >('hours-minutes')
+    const [typeStartInterval, setTypeStartInterval] =
+        useState<TypeOfStartInterval>('now')
+
+    const [unitOfTime, setUnitOfTime] =
+        useState<TypeUnitOfTime>('hours-minutes')
 
     const getLocalISOTime = () => {
         const date = new Date()
@@ -69,7 +94,14 @@ const Home: React.FC = () => {
 
         setShowError(false)
 
-        if (unitOfTime === 'hours') {
+        if (unitOfTime === 'days') {
+            const diff = endDate.getTime() - startDate.getTime()
+            const days = Math.floor(diff / 1000 / 60 / 60 / 24)
+            setResult(`${days}d`)
+
+            setShowResult(true)
+            return
+        } else if (unitOfTime === 'hours') {
             const diff = endDate.getTime() - startDate.getTime()
             const hours = Math.floor(diff / 1000 / 60 / 60)
             setResult(`${hours}h`)
@@ -83,11 +115,33 @@ const Home: React.FC = () => {
 
             setShowResult(true)
             return
-        } else {
+        } else if (unitOfTime === 'seconds') {
+            const diff = endDate.getTime() - startDate.getTime()
+            const seconds = Math.floor(diff / 1000)
+            setResult(`${seconds}s`)
+
+            setShowResult(true)
+            return
+        } else if (unitOfTime === 'hours-minutes') {
             const diff = endDate.getTime() - startDate.getTime()
             const hours = Math.floor(diff / 1000 / 60 / 60)
             const minutes = Math.floor((diff / 1000 / 60) % 60)
             setResult(`${hours}h ${minutes}m`)
+
+            setShowResult(true)
+        } else if (unitOfTime === 'days-hours') {
+            const diff = endDate.getTime() - startDate.getTime()
+            const days = Math.floor(diff / 1000 / 60 / 60 / 24)
+            const hours = Math.floor((diff / 1000 / 60 / 60) % 24)
+            setResult(`${days}d ${hours}h`)
+
+            setShowResult(true)
+        } else if (unitOfTime === 'days-hours-minutes') {
+            const diff = endDate.getTime() - startDate.getTime()
+            const days = Math.floor(diff / 1000 / 60 / 60 / 24)
+            const hours = Math.floor((diff / 1000 / 60 / 60) % 24)
+            const minutes = Math.floor((diff / 1000 / 60) % 60)
+            setResult(`${days}d ${hours}h ${minutes}m`)
 
             setShowResult(true)
         }
@@ -133,25 +187,19 @@ const Home: React.FC = () => {
                             interface="popover"
                             placeholder="Selecione a unidade"
                             onIonChange={(e) => {
-                                setUnitOfTime(
-                                    e.detail.value as
-                                        | 'hours'
-                                        | 'minutes'
-                                        | 'hours-minutes'
-                                )
+                                setUnitOfTime(e.detail.value as TypeUnitOfTime)
 
                                 hiddenComponents()
                             }}
                         >
-                            <IonSelectOption value="hours">
-                                Horas
-                            </IonSelectOption>
-                            <IonSelectOption value="minutes">
-                                Minutos
-                            </IonSelectOption>
-                            <IonSelectOption value="hours-minutes">
-                                Horas e Minutos
-                            </IonSelectOption>
+                            {unitOfTimeOptions.map((option) => (
+                                <IonSelectOption
+                                    key={option.value}
+                                    value={option.value}
+                                >
+                                    {option.label}
+                                </IonSelectOption>
+                            ))}
                         </IonSelect>
                     </IonItem>
                 </IonList>
@@ -167,16 +215,20 @@ const Home: React.FC = () => {
                             placeholder="Selecione o tipo de intervalo"
                             onIonChange={(e) => {
                                 setTypeStartInterval(
-                                    e.detail.value as 'custom' | 'now'
+                                    e.detail.value as TypeOfStartInterval
                                 )
 
                                 hiddenComponents()
                             }}
                         >
-                            <IonSelectOption value="now">Agora</IonSelectOption>
-                            <IonSelectOption value="custom">
-                                Personalizado
-                            </IonSelectOption>
+                            {startIntervalOptions.map((option) => (
+                                <IonSelectOption
+                                    key={option.value}
+                                    value={option.value}
+                                >
+                                    {option.label}
+                                </IonSelectOption>
+                            ))}
                         </IonSelect>
                     </IonItem>
                 </IonList>
