@@ -148,7 +148,8 @@ const Home: React.FC = () => {
 
         switch (unitOfTime) {
             case 'days':
-                setResult(`${days}d`)
+                const totalDays = differenceInDays(endDate, startDate)
+                setResult(`${totalDays}d`)
                 break
             case 'hours':
                 const totalHours = differenceInHours(endDate, startDate)
