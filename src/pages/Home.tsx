@@ -24,6 +24,7 @@ import {
     differenceInSeconds,
     intervalToDuration,
 } from 'date-fns'
+import LocalStorageUtil from '../utils/LocalStorage'
 
 type TypeUnitOfTime =
     | 'seconds'
@@ -93,10 +94,15 @@ const Home: React.FC = () => {
     const [showResult, setShowResult] = useState<boolean>(false)
     const [result, setResult] = useState<string>('')
     const [typeStartInterval, setTypeStartInterval] =
-        useState<TypeOfStartInterval>('now')
+        useState<TypeOfStartInterval>(
+            (LocalStorageUtil.getItem(
+                'startIntervalType'
+            ) as TypeOfStartInterval) ?? 'now'
+        )
 
-    const [unitOfTime, setUnitOfTime] =
-        useState<TypeUnitOfTime>('hours-minutes')
+    const [unitOfTime, setUnitOfTime] = useState<TypeUnitOfTime>(
+        (LocalStorageUtil.getItem('timeUnit') as TypeUnitOfTime) ?? 'seconds'
+    )
 
     const getLocalISOTime = () => {
         const date = new Date()
@@ -311,7 +317,10 @@ const Home: React.FC = () => {
                             placeholder="Selecione a unidade"
                             onIonChange={(e) => {
                                 setUnitOfTime(e.detail.value as TypeUnitOfTime)
-
+                                LocalStorageUtil.setItem(
+                                    'timeUnit',
+                                    e.detail.value
+                                )
                                 hiddenComponents()
                             }}
                         >
@@ -340,7 +349,10 @@ const Home: React.FC = () => {
                                 setTypeStartInterval(
                                     e.detail.value as TypeOfStartInterval
                                 )
-
+                                LocalStorageUtil.setItem(
+                                    'startIntervalType',
+                                    e.detail.value
+                                )
                                 hiddenComponents()
                             }}
                         >
