@@ -31,4 +31,5 @@ yarn-error.log*
 .eslintcache
 
 /android
+/public/manifest*
 /public/assets/icons
