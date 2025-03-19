@@ -1,3 +1,4 @@
+import { App } from '@capacitor/app'
 import {
     IonButton,
     IonDatetime,
@@ -13,10 +14,6 @@ import {
     IonText,
     useIonRouter,
 } from '@ionic/react'
-import { calculatorOutline, trashOutline } from 'ionicons/icons'
-import './Home.css'
-import { useState } from 'react'
-import { App } from '@capacitor/app'
 import {
     differenceInDays,
     differenceInHours,
@@ -24,7 +21,10 @@ import {
     differenceInSeconds,
     intervalToDuration,
 } from 'date-fns'
+import { calculatorOutline, trashOutline } from 'ionicons/icons'
+import { useState } from 'react'
 import LocalStorageUtil from '../utils/LocalStorage'
+import './Home.css'
 
 type TypeUnitOfTime =
     | 'seconds'
@@ -500,6 +500,13 @@ const Home: React.FC = () => {
                         />
                     </div>
                 )}
+
+                <footer className="footer">
+                    <p>
+                        &copy; {new Date().getFullYear()} PurchaseWay. Todos os
+                        direitos reservados.
+                    </p>
+                </footer>
             </section>
         </IonPage>
     )

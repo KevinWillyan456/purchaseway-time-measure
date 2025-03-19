@@ -62,3 +62,12 @@
     border-radius: 50px;
     text-align: center;
 }
+.footer {
+    margin-top: 20px;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 14px;
+    color: var(--color-black);
+    background-color: var(--color-white);
+    border-top: 1px solid #0000001a;
+}
