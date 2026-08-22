@@ -1,7 +1,7 @@
 {
-    "name": "Pw Time Measure",
-    "integrations": {
-        "capacitor": {}
-    },
-    "type": "react-vite"
+  "name": "Pw Time Measure",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
 }

@@ -8,7 +8,10 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint",
-    "app:build": "ionic cap build android --no-open"
+    "app:build": "ionic cap build android --no-open",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "format:ci": "prettier . --check"
   },
   "dependencies": {
     "@capacitor/android": "6.1.1",
@@ -37,6 +40,7 @@
     "eslint": "^8.35.0",
     "eslint-plugin-react": "^7.32.2",
     "jsdom": "^22.1.0",
+    "prettier": "^3.9.6",
     "terser": "^5.4.0",
     "typescript": "^5.1.6",
     "vite": "~5.2.0",
