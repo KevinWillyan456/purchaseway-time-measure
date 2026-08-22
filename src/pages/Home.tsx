@@ -15,13 +15,7 @@ import {
   useIonRouter,
   useIonToast,
 } from '@ionic/react'
-import {
-  differenceInDays,
-  differenceInHours,
-  differenceInMinutes,
-  differenceInSeconds,
-  intervalToDuration,
-} from 'date-fns'
+import { intervalToDuration } from 'date-fns'
 
 import {
   calculatorOutline,
@@ -37,6 +31,7 @@ import {
 } from 'ionicons/icons'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { ThemeContext } from '../App'
+import { calculateInterval } from '../utils/intervalCalc'
 import LocalStorageUtil from '../utils/LocalStorage'
 import './Home.css'
 
@@ -163,8 +158,12 @@ const Home: React.FC = () => {
     Haptics.impact({ style: ImpactStyle.Medium })
 
     const now = getLocalISOTime()
-    const startDate = typeStartInterval === 'now' ? new Date(now) : new Date(start)
-    const endDate = typeStartInterval === 'now' ? new Date(now) : new Date(end)
+    // No modo custom, o IonDatetime retorna sem segundos,
+    // por isso precisamos normalizar os segundos para 0
+    // para evitar discrepância com o relógio da máquina.
+    const stripSeconds = (iso: string) => iso.replace(/(T\d{2}:\d{2}):\d{2}(\.\d+)?/, '$1:00')
+    const startDate = typeStartInterval === 'now' ? new Date(now) : new Date(stripSeconds(start))
+    const endDate = typeStartInterval === 'now' ? new Date(now) : new Date(stripSeconds(end))
 
     if (startDate > endDate) {
       setShowError(true)
@@ -174,108 +173,10 @@ const Home: React.FC = () => {
 
     setShowError(false)
 
-    const duration = intervalToDuration({ start: startDate, end: endDate })
-
-    const years = duration.years || 0
-    const months = duration.months || 0
-    const days = duration.days || 0
-    const hours = duration.hours || 0
-    const minutes = duration.minutes || 0
-
-    switch (unitOfTime) {
-      case 'days':
-        const totalDays = differenceInDays(endDate, startDate)
-        setResult(`${totalDays}d`)
-        break
-      case 'hours':
-        const totalHours = differenceInHours(endDate, startDate)
-        setResult(`${totalHours}h`)
-        break
-      case 'minutes':
-        const totalMinutes = differenceInMinutes(endDate, startDate)
-        setResult(`${totalMinutes}m`)
-        break
-      case 'seconds':
-        const totalSeconds = differenceInSeconds(endDate, startDate)
-        setResult(`${totalSeconds}s`)
-        break
-      case 'hours-minutes':
-        const hoursForMinutes = Math.floor(differenceInMinutes(endDate, startDate) / 60)
-        const minutesForMinutes = differenceInMinutes(endDate, startDate) % 60
-        setResult(`${hoursForMinutes}h ${minutesForMinutes}m`)
-        break
-      case 'days-hours':
-        const daysForHours = Math.floor(differenceInHours(endDate, startDate) / 24)
-        const remainingHoursForHours = differenceInHours(endDate, startDate) % 24
-        setResult(`${daysForHours}d ${remainingHoursForHours}h`)
-        break
-      case 'days-hours-minutes': {
-        const totalMins = differenceInMinutes(endDate, startDate)
-        const d = Math.floor(totalMins / (24 * 60))
-        const h = Math.floor((totalMins % (24 * 60)) / 60)
-        const m = totalMins % 60
-        setResult(`${d}d ${h}h ${m}m`)
-        break
-      }
-      case 'weeks':
-        const weeks = Math.floor(differenceInDays(endDate, startDate) / 7)
-        setResult(`${weeks}w`)
-        break
-      case 'weeks-days':
-        const totalWeeks = Math.floor(differenceInDays(endDate, startDate) / 7)
-        const daysWithinWeek = differenceInDays(endDate, startDate) % 7
-        setResult(`${totalWeeks}w ${daysWithinWeek}d`)
-        break
-      case 'weeks-days-hours':
-        const weeksForDays = Math.floor(differenceInHours(endDate, startDate) / (7 * 24))
-        const daysWithinWeekForHours = Math.floor(
-          (differenceInHours(endDate, startDate) % (7 * 24)) / 24,
-        )
-        const hoursWithinWeekForHours = differenceInHours(endDate, startDate) % 24
-        setResult(`${weeksForDays}w ${daysWithinWeekForHours}d ${hoursWithinWeekForHours}h`)
-        break
-      case 'weeks-days-hours-minutes': {
-        const totalMins = differenceInMinutes(endDate, startDate)
-        const w = Math.floor(totalMins / (7 * 24 * 60))
-        const wd = Math.floor((totalMins % (7 * 24 * 60)) / (24 * 60))
-        const wh = Math.floor((totalMins % (24 * 60)) / 60)
-        const wm = totalMins % 60
-        setResult(`${w}w ${wd}d ${wh}h ${wm}m`)
-        break
-      }
-      case 'months':
-        setResult(`${months}M`)
-        break
-      case 'months-days':
-        setResult(`${months}M ${days}d`)
-        break
-      case 'months-days-hours':
-        setResult(`${months}M ${days}d ${hours}h`)
-        break
-      case 'months-days-hours-minutes':
-        setResult(`${months}M ${days}d ${hours}h ${minutes}m`)
-        break
-      case 'years':
-        setResult(`${years}y`)
-        break
-      case 'years-months':
-        setResult(`${years}y ${months}M`)
-        break
-      case 'years-months-days':
-        setResult(`${years}y ${months}M ${days}d`)
-        break
-      case 'years-months-days-hours':
-        setResult(`${years}y ${months}M ${days}d ${hours}h`)
-        break
-      case 'years-months-days-hours-minutes':
-        setResult(`${years}y ${months}M ${days}d ${hours}h ${minutes}m`)
-        break
-      default:
-        setShowResult(false)
-        return
-    }
+    setResult(calculateInterval(startDate, endDate, unitOfTime))
 
     // Calcular equivalências em outras unidades
+    const duration = intervalToDuration({ start: startDate, end: endDate })
     const totalSec = Math.floor((endDate.getTime() - startDate.getTime()) / 1000)
     const totalMin = Math.floor(totalSec / 60)
     const totalHrs = Math.floor(totalMin / 60)
@@ -363,6 +264,7 @@ const Home: React.FC = () => {
   const ionRouter = useIonRouter()
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handler = (ev: any) => {
       ev.detail.register(-1, () => {
         if (!ionRouter.canGoBack()) {
@@ -370,8 +272,8 @@ const Home: React.FC = () => {
         }
       })
     }
-    document.addEventListener('ionBackButton', handler)
-    return () => document.removeEventListener('ionBackButton', handler)
+    document.addEventListener('ionBackButton' as string, handler as EventListener)
+    return () => document.removeEventListener('ionBackButton' as string, handler as EventListener)
   }, [ionRouter])
 
   return (
@@ -522,13 +424,7 @@ const Home: React.FC = () => {
         </div>
 
         {/* ===== BOTÃO CALCULAR ===== */}
-        <button
-          className="calculate-btn"
-          disabled={
-            showError || (typeStartInterval === 'custom' && new Date(start) > new Date(end))
-          }
-          onClick={handleCalculate}
-        >
+        <button className="calculate-btn" onClick={handleCalculate}>
           <IonIcon icon={calculatorOutline} />
           Calcular
         </button>
