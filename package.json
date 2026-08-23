@@ -3,7 +3,6 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
-  "packageManager": "pnpm@9.15.9",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -14,8 +13,8 @@
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "format:ci": "prettier . --check",
-    "fix": "pnpm format && pnpm lint:fix",
-    "check": "pnpm check:ts && pnpm lint --max-warnings=0 && pnpm format:check && pnpm test",
+    "fix": "npm run format && npm run lint:fix",
+    "check": "npm run check:ts && npm run lint -- --max-warnings=0 && npm run format:check && npm run test",
     "check:ts": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",

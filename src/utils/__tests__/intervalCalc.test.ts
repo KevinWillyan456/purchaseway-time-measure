@@ -158,6 +158,48 @@ describe('hours-minutes', () => {
 })
 
 // ============================================================
+// 5b. HORAS-MINUTOS-SEGUNDOS
+// ============================================================
+describe('hours-minutes-seconds', () => {
+  it('0h 0m 1s', () => {
+    expect(
+      calculateInterval(
+        ds(2024, 1, 1, 10, 0, 0),
+        ds(2024, 1, 1, 10, 0, 1),
+        'hours-minutes-seconds',
+      ),
+    ).toBe('0h 0m 1s')
+  })
+  it('1h 0m 0s', () => {
+    expect(
+      calculateInterval(
+        ds(2024, 1, 1, 10, 0, 0),
+        ds(2024, 1, 1, 11, 0, 0),
+        'hours-minutes-seconds',
+      ),
+    ).toBe('1h 0m 0s')
+  })
+  it('2h 30m 45s', () => {
+    expect(
+      calculateInterval(
+        ds(2024, 1, 1, 10, 0, 0),
+        ds(2024, 1, 1, 12, 30, 45),
+        'hours-minutes-seconds',
+      ),
+    ).toBe('2h 30m 45s')
+  })
+  it('23h 59m 59s (quase 1 dia)', () => {
+    expect(
+      calculateInterval(
+        ds(2024, 1, 1, 0, 0, 0),
+        ds(2024, 1, 1, 23, 59, 59),
+        'hours-minutes-seconds',
+      ),
+    ).toBe('23h 59m 59s')
+  })
+})
+
+// ============================================================
 // 6. DIAS-HORAS
 // ============================================================
 describe('days-hours', () => {
@@ -208,6 +250,48 @@ describe('days-hours-minutes', () => {
     expect(calculateInterval(d(2024, 1, 1, 0, 0), d(2024, 2, 1, 0, 0), 'days-hours-minutes')).toBe(
       '31d 0h 0m',
     )
+  })
+})
+
+// ============================================================
+// 7b. DIAS-HORAS-MINUTOS-SEGUNDOS
+// ============================================================
+describe('days-hours-minutes-seconds', () => {
+  it('0d 0h 0m 1s', () => {
+    expect(
+      calculateInterval(
+        ds(2024, 1, 1, 10, 0, 0),
+        ds(2024, 1, 1, 10, 0, 1),
+        'days-hours-minutes-seconds',
+      ),
+    ).toBe('0d 0h 0m 1s')
+  })
+  it('1d 0h 0m 0s', () => {
+    expect(
+      calculateInterval(
+        ds(2024, 1, 1, 10, 0, 0),
+        ds(2024, 1, 2, 10, 0, 0),
+        'days-hours-minutes-seconds',
+      ),
+    ).toBe('1d 0h 0m 0s')
+  })
+  it('2d 5h 30m 15s', () => {
+    expect(
+      calculateInterval(
+        ds(2024, 1, 1, 10, 0, 0),
+        ds(2024, 1, 3, 15, 30, 15),
+        'days-hours-minutes-seconds',
+      ),
+    ).toBe('2d 5h 30m 15s')
+  })
+  it('0d 23h 59m 59s (quase 1 dia)', () => {
+    expect(
+      calculateInterval(
+        ds(2024, 1, 1, 0, 0, 0),
+        ds(2024, 1, 1, 23, 59, 59),
+        'days-hours-minutes-seconds',
+      ),
+    ).toBe('0d 23h 59m 59s')
   })
 })
 
@@ -535,6 +619,39 @@ describe('years-months-days-hours-minutes', () => {
         'years-months-days-hours-minutes',
       ),
     ).toBe('10y 0M 0d 0h 0m')
+  })
+})
+
+// ============================================================
+// 20b. ANOS-MESES-DIAS-HORAS-MINUTOS-SEGUNDOS
+// ============================================================
+describe('years-months-days-hours-minutes-seconds', () => {
+  it('1y 0M 0d 0h 0m 0s', () => {
+    expect(
+      calculateInterval(
+        ds(2024, 1, 1, 10, 30, 0),
+        ds(2025, 1, 1, 10, 30, 0),
+        'years-months-days-hours-minutes-seconds',
+      ),
+    ).toBe('1y 0M 0d 0h 0m 0s')
+  })
+  it('0y 11M 30d 23h 59m 59s (quase 1 ano, bissexto)', () => {
+    expect(
+      calculateInterval(
+        ds(2024, 1, 1, 0, 0, 0),
+        ds(2024, 12, 31, 23, 59, 59),
+        'years-months-days-hours-minutes-seconds',
+      ),
+    ).toBe('0y 11M 30d 23h 59m 59s')
+  })
+  it('2y 3M 10d 5h 45m 30s', () => {
+    expect(
+      calculateInterval(
+        ds(2022, 1, 1, 10, 0, 0),
+        ds(2024, 4, 11, 15, 45, 30),
+        'years-months-days-hours-minutes-seconds',
+      ),
+    ).toBe('2y 3M 10d 5h 45m 30s')
   })
 })
 

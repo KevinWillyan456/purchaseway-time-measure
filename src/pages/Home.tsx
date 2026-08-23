@@ -40,9 +40,11 @@ type TypeUnitOfTime =
   | 'minutes'
   | 'hours'
   | 'hours-minutes'
+  | 'hours-minutes-seconds'
   | 'days'
   | 'days-hours'
   | 'days-hours-minutes'
+  | 'days-hours-minutes-seconds'
   | 'weeks'
   | 'weeks-days'
   | 'weeks-days-hours'
@@ -56,15 +58,21 @@ type TypeUnitOfTime =
   | 'years-months-days'
   | 'years-months-days-hours'
   | 'years-months-days-hours-minutes'
+  | 'years-months-days-hours-minutes-seconds'
 
 const unitOfTimeOptions: { value: TypeUnitOfTime; label: string }[] = [
   { value: 'seconds', label: 'Segundos' },
   { value: 'minutes', label: 'Minutos' },
   { value: 'hours', label: 'Horas' },
   { value: 'hours-minutes', label: 'Horas e Minutos' },
+  { value: 'hours-minutes-seconds', label: 'Horas, Minutos e Segundos' },
   { value: 'days', label: 'Dias' },
   { value: 'days-hours', label: 'Dias e Horas' },
   { value: 'days-hours-minutes', label: 'Dias, Horas e Minutos' },
+  {
+    value: 'days-hours-minutes-seconds',
+    label: 'Dias, Horas, Minutos e Segundos',
+  },
   { value: 'weeks', label: 'Semanas' },
   { value: 'weeks-days', label: 'Semanas e Dias' },
   { value: 'weeks-days-hours', label: 'Semanas, Dias e Horas' },
@@ -87,6 +95,10 @@ const unitOfTimeOptions: { value: TypeUnitOfTime; label: string }[] = [
     value: 'years-months-days-hours-minutes',
     label: 'Anos, Meses, Dias, Horas e Minutos',
   },
+  {
+    value: 'years-months-days-hours-minutes-seconds',
+    label: 'Anos, Meses, Dias, Horas, Minutos e Segundos',
+  },
 ]
 
 type TypeOfStartInterval = 'now' | 'custom'
@@ -104,7 +116,7 @@ const Home: React.FC = () => {
   const [result, setResult] = useState<string>('')
   const [alternatives, setAlternatives] = useState<{ label: string; value: string }[]>([])
   const resultRef = useRef<HTMLDivElement>(null)
-  const [present] = useIonToast()
+  const [present, dismiss] = useIonToast()
   const { cycleMode, icon: themeIcon, label: themeLabel } = useContext(ThemeContext)
 
   // Detectar mobile para usar action-sheet (reativo a resize)
@@ -163,7 +175,7 @@ const Home: React.FC = () => {
     // para evitar discrepância com o relógio da máquina.
     const stripSeconds = (iso: string) => iso.replace(/(T\d{2}:\d{2}):\d{2}(\.\d+)?/, '$1:00')
     const startDate = typeStartInterval === 'now' ? new Date(now) : new Date(stripSeconds(start))
-    const endDate = typeStartInterval === 'now' ? new Date(now) : new Date(stripSeconds(end))
+    const endDate = new Date(stripSeconds(end))
 
     if (startDate > endDate) {
       setShowError(true)
@@ -226,19 +238,13 @@ const Home: React.FC = () => {
 
     setAlternatives(filteredAlts)
     setShowResult(true)
-
-    setTimeout(() => {
-      resultRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      })
-    }, 100)
   }
 
   const handleCopy = async (value: string) => {
     try {
       await navigator.clipboard.writeText(value)
       Haptics.impact({ style: ImpactStyle.Light })
+      await dismiss().catch(() => {})
       present({
         message: `${value} copiado!`,
         duration: 2000,

@@ -12,8 +12,10 @@ export type TimeUnit =
   | 'minutes'
   | 'seconds'
   | 'hours-minutes'
+  | 'hours-minutes-seconds'
   | 'days-hours'
   | 'days-hours-minutes'
+  | 'days-hours-minutes-seconds'
   | 'weeks'
   | 'weeks-days'
   | 'weeks-days-hours'
@@ -27,25 +29,11 @@ export type TimeUnit =
   | 'years-months-days'
   | 'years-months-days-hours'
   | 'years-months-days-hours-minutes'
-
-function getUnitSuffix(unit: TimeUnit): string {
-  if (unit.includes('minutes')) return 'm'
-  if (unit.includes('hours')) return 'h'
-  if (unit.includes('days')) return 'd'
-  if (unit.includes('weeks')) return 'w'
-  if (unit.includes('months')) return 'M'
-  if (unit.includes('years')) return 'y'
-  if (unit === 'seconds') return 's'
-  return ''
-}
+  | 'years-months-days-hours-minutes-seconds'
 
 export function calculateInterval(startDate: Date, endDate: Date, unitOfTime: TimeUnit): string {
   if (startDate > endDate) {
     throw new Error('startDate must be before endDate')
-  }
-
-  if (startDate.getTime() === endDate.getTime()) {
-    return '0' + getUnitSuffix(unitOfTime)
   }
 
   const duration = intervalToDuration({ start: startDate, end: endDate })
@@ -76,6 +64,14 @@ export function calculateInterval(startDate: Date, endDate: Date, unitOfTime: Ti
       const m = totalMinutes % 60
       return `${h}h ${m}m`
     }
+    case 'hours-minutes-seconds': {
+      const totalSeconds = differenceInSeconds(endDate, startDate)
+      const h = Math.floor(totalSeconds / 3600)
+      const remainingAfterHours = totalSeconds % 3600
+      const m = Math.floor(remainingAfterHours / 60)
+      const s = remainingAfterHours % 60
+      return `${h}h ${m}m ${s}s`
+    }
     case 'days-hours': {
       const totalHours = differenceInHours(endDate, startDate)
       const d = Math.floor(totalHours / 24)
@@ -88,6 +84,16 @@ export function calculateInterval(startDate: Date, endDate: Date, unitOfTime: Ti
       const h = Math.floor((totalMins % (24 * 60)) / 60)
       const m = totalMins % 60
       return `${d}d ${h}h ${m}m`
+    }
+    case 'days-hours-minutes-seconds': {
+      const totalSeconds = differenceInSeconds(endDate, startDate)
+      const d = Math.floor(totalSeconds / 86400)
+      const remainingAfterDays = totalSeconds % 86400
+      const h = Math.floor(remainingAfterDays / 3600)
+      const remainingAfterHours = remainingAfterDays % 3600
+      const m = Math.floor(remainingAfterHours / 60)
+      const s = remainingAfterHours % 60
+      return `${d}d ${h}h ${m}m ${s}s`
     }
     case 'weeks': {
       const totalDays = differenceInDays(endDate, startDate)
@@ -157,6 +163,13 @@ export function calculateInterval(startDate: Date, endDate: Date, unitOfTime: Ti
       const hours = duration.hours || 0
       const minutes = duration.minutes || 0
       return `${years}y ${months}M ${days}d ${hours}h ${minutes}m`
+    }
+    case 'years-months-days-hours-minutes-seconds': {
+      const days = duration.days || 0
+      const hours = duration.hours || 0
+      const minutes = duration.minutes || 0
+      const seconds = duration.seconds || 0
+      return `${years}y ${months}M ${days}d ${hours}h ${minutes}m ${seconds}s`
     }
     default:
       throw new Error(`Unknown unit: ${unitOfTime}`)
