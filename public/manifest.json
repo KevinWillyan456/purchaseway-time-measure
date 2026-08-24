@@ -1,0 +1,22 @@
+{
+  "name": "Purchaseway Time Measure",
+  "short_name": "Pw Time",
+  "description": "Calculadora de tempo e medição de intervalos",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f5f6",
+  "theme_color": "#68545d",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "assets/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
